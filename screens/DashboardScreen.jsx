@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TextInput } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TextInput, Switch } from "react-native";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
@@ -13,15 +13,28 @@ export default function DashboardScreen() {
   const [ loading, setLoading ] = useState(true);
 
   const [ searchTerm, setSearchTerm ] = useState("");
+  const [ searchTermMaxAmount, setsearchTermMaxAmount ] = useState("");
 
-  const filteredFrais = fraisList.filter(
-    (frais) =>
-     frais.montantvalide != null 
-  ).filter(
-    (frais) =>
-      searchTerm.includes(frais.anneemois) ||
-      searchTerm.includes(frais.id_visiteur)
-  );
+  const [filterNonNull, setFilterNonNull] = useState(true);
+
+  const filteredFrais = fraisList
+    .filter(
+      (frais) =>
+        !filterNonNull ||
+        frais.montantvalide !== null
+    )
+    .filter(
+      (frais) =>
+        searchTerm === "" ||
+        frais.anneemois.includes(searchTerm) ||
+        frais.id_visiteur.toString().includes(searchTerm)
+    )
+    .filter(
+      (frais) =>
+        searchTermMaxAmount === "" ||
+        (frais.montantvalide !== null &&
+          frais.montantvalide > parseFloat(searchTermMaxAmount))
+    );
 
   useEffect(() => {
     setTimeout(() => {
@@ -40,7 +53,13 @@ export default function DashboardScreen() {
       <Navbar />
       <View style={styles.content}>
         <Text>Bienvenue {user}</Text>
-        <TextInput placeholder="année-mois ou ID visiteur..." value={ searchTerm } onChangeText={setSearchTerm}/>
+        <View style={ styles.searchContainer }>
+          <TextInput style={ styles.searchBar } placeholder="année-mois ou ID visiteur..." value={ searchTerm } onChangeText={setSearchTerm}/>
+          <Switch value={filterNonNull} onValueChange={setFilterNonNull}/>
+          <Text>Only Valid Amount</Text>
+        </View>
+        <TextInput style={ styles.searchBar } placeholder="max amount" value={ searchTermMaxAmount } onChangeText={setsearchTermMaxAmount}/>
+        
         <FlatList
         data={filteredFrais} 
         renderItem={ ({ item }) => <FraisCard frais={item}/> } 
@@ -58,4 +77,15 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 16, gap: 20, },
+  searchBar: {
+    backgroundColor: '#DDD',
+    textAlign: 'center',
+    borderRadius: 10,
+    width: 210
+  },
+  searchContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
 });
