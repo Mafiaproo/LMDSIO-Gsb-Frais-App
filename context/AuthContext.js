@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { signIn, signOut } from "../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -11,6 +11,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const [token, setToken] = useState(null);
+
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   // 3. Fonction de connexion
   async function loginUser(login, password)
@@ -34,15 +36,54 @@ export function AuthProvider({ children }) {
     setToken(null);
 
   };
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const storedUser = await getCurrentUser();
+        const storedToken = await getAuthToken();
+
+        if(storedUser && storedToken)
+        {
+          setUser(storedUser);
+          setToken(storedToken);
+        }
+      }
+      catch (error)
+      {
+        console.error("Erreur lors de la restauuration de session : ", error);
+      }
+      finally 
+      {
+        setSessionLoading(false);
+      }
+
+    };
+    restoreSession();
+  }, []);
  
   // 5. Valeurs exposées aux composants enfants
   return (
-    <AuthContext.Provider value={{ token, user, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ token, user, sessionLoading, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
- 
+
+export const getCurrentUser = async () => {
+  const raw = await AsyncStorage.getItem('user')
+
+  // si raw est pas null on le parse et envoie sinon on renvoie null
+  return raw !== null ? JSON.parse(raw) : null;
+
+};
+
+export const getAuthToken = async () => {
+  const token = await AsyncStorage.getItem('token');
+
+  return token !== null ? token : null;
+};
+
 // 6. Hook personnalisé pour utiliser le contexte facilement
 export function useAuth() {
   return useContext(AuthContext);
