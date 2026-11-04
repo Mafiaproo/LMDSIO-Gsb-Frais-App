@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-import { signIn } from "../services/authService";
  
 // 1. Création du contexte
 const AuthContext = createContext();
@@ -9,18 +8,19 @@ export function AuthProvider({ children }) {
   // État local pour stocker l’utilisateur (null = non connecté)
   const [user, setUser] = useState(null);
 
-  const [token, setToken] = useState(null);
-
   // 3. Fonction de connexion
-  async function loginUser(login, password)
-  {
-    const data = await signIn(login, password).json;
-
-    setUser(data.visiteur);
-    setToken(data.token);
-
-    return data;
-  }
+  const loginUser = (login, password) => {
+    // ToDo : implémenter une connexion avec une logique simplifiée : vérifie
+    // si login/mot de passe correspondent à des valeurs prédéfinies
+    // Si le login vaut "Andre" et le mot de passe vaut "secret"
+    // alors mettre à jour l’état avec le login de l’utilisateur connecté ET renvoyer true
+    if (login==="Andre" && password==="secret"){
+        setUser(login);
+        return true;
+    }
+    // Si la connexion échoue, renvoyer false
+    return false;
+  };
  
   // 4. Fonction de déconnexion
   const logoutUser = () => {
@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
  
   // 5. Valeurs exposées aux composants enfants
   return (
-    <AuthContext.Provider value={{ token, user, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ user, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

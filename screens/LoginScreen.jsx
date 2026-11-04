@@ -17,17 +17,12 @@ export default function LoginScreen() {
   const navigation = useNavigation();
   
   // 4. Déclaration de la fonction handleSubmit
-  async function handleSubmit(){
+  const handleSubmit = () => {
     // Appel de la fonction loginUser avec login et password
-
-    console.log('pressed !');
-    try {
-      loginUser(login, password);
-      console.log('pressed !');
-    }
-    catch (error)
-    {
-      Alert.alert(error); // Affiche une erreur si échec
+    if (loginUser(login, password)) {
+      navigation.navigate("Dashboard"); // Redirige vers Dashboard si succès
+    } else {
+      Alert.alert("Identifiants incorrects"); // Affiche une erreur si échec
     }
   };
 
