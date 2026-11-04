@@ -4,9 +4,10 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import fraisData from "../data/frais.json";
 import FraisCard from "../components/FraisCard";
+import { API_URL } from '../services/authService';
 
 export default function DashboardScreen() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [ fraisList, setFraisList ] = useState([]);
 
@@ -37,10 +38,33 @@ export default function DashboardScreen() {
     );
 
   useEffect(() => {
-    setTimeout(() => {
-      setFraisList(fraisData);
-      setLoading(false);
-    }, 500)
+    const fetchFrais = async () => {
+      try {
+        const response = await fetch(`${API_URL}frais/liste/${user.id_visiteur}`, {
+          'method': 'get',
+          'headers': {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        setFraisList(data);
+        print(typeof(data));
+        
+      }
+      catch (error)
+      {
+        console.log(error);
+      }
+      finally
+      {
+        setLoading(false);
+      }
+    };
+
+    fetchFrais();
   }, []);
 
   if (loading)
@@ -52,7 +76,7 @@ export default function DashboardScreen() {
     <View style={styles.screen}>
       <Navbar />
       <View style={styles.content}>
-        <Text>Bienvenue {user}</Text>
+        <Text>Bienvenue {user.nom_visiteur} {user.prenom_visiteur}</Text>
         <View style={ styles.searchContainer }>
           <TextInput style={ styles.searchBar } placeholder="année-mois ou ID visiteur..." value={ searchTerm } onChangeText={setSearchTerm}/>
           <Switch value={filterNonNull} onValueChange={setFilterNonNull}/>
