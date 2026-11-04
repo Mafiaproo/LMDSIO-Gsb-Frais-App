@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
-import { signIn } from "../services/authService";
- 
+import { signIn, signOut } from "../services/authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 // 1. Création du contexte
 const AuthContext = createContext();
  
@@ -14,8 +15,10 @@ export function AuthProvider({ children }) {
   // 3. Fonction de connexion
   async function loginUser(login, password)
   {
-    const data = await signIn(login, password).json;
-
+    const data = await signIn(login, password);
+    
+    console.log("infos :" + data.visiteur + " " + data.token);
+    
     setUser(data.visiteur);
     setToken(data.token);
 
@@ -23,9 +26,13 @@ export function AuthProvider({ children }) {
   }
  
   // 4. Fonction de déconnexion
-  const logoutUser = () => {
-    // ToDo : réinitialiser la valeur de l’état à null
+  const logoutUser = async () => {
+
+    await signOut();
+
     setUser(null);
+    setToken(null);
+
   };
  
   // 5. Valeurs exposées aux composants enfants

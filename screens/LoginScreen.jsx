@@ -17,18 +17,16 @@ export default function LoginScreen() {
   const navigation = useNavigation();
   
   // 4. Déclaration de la fonction handleSubmit
-  async function handleSubmit(){
-    // Appel de la fonction loginUser avec login et password
-
-    console.log('pressed !');
+  async function handleSubmit() 
+  {
     try {
-      loginUser(login, password);
-      console.log('pressed !');
+      await loginUser(login, password);
     }
     catch (error)
     {
-      Alert.alert(error); // Affiche une erreur si échec
+      Alert.alert(error);
     }
+
   };
 
   // 5. Rend le formulaire

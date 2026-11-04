@@ -10,9 +10,7 @@ export async function signIn(login, pwd)
         body: JSON.stringify({login, pwd}),
     });
 
-    //const data = JSON.parse(response.json());
-    console.log('test');
-    const data = response.json();
+    const data = await response.json();
 
     console.log("Data : ");
     console.log(data);
@@ -25,3 +23,8 @@ export async function signIn(login, pwd)
     return data;
 };
 
+export async function signOut()
+{
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('user');
+}
