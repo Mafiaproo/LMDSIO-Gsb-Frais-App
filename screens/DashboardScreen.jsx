@@ -18,6 +18,36 @@ export default function DashboardScreen() {
 
   const [filterNonNull, setFilterNonNull] = useState(true);
 
+    useEffect(() => {
+    const fetchFrais = async () => {
+      try {
+        const response = await fetch(`${API_URL}frais/liste/${user.id_visiteur}`, {
+          'method': 'get',
+          'headers': {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        setFraisList(data);
+        print(typeof(data));
+        
+      }
+      catch (error)
+      {
+        console.log(error);
+      }
+      finally
+      {
+        setLoading(false);
+      }
+    };
+
+    fetchFrais();
+  }, []);
+
   const filteredFrais = fraisList
     .filter(
       (frais) =>
