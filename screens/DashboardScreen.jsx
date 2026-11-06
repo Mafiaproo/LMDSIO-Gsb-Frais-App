@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import fraisData from "../data/frais.json";
 import FraisCard from "../components/FraisCard";
-import { API_URL } from '../services/authService';
+import { API_URL } from "../config";
 
 export default function DashboardScreen() {
   const { user, token } = useAuth();
